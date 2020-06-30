@@ -6,6 +6,8 @@ creates a heat map per 100k population. It is easy to see how to adjust the inpu
 
 Covid dataset on kaggle: https://www.kaggle.com/fireballbyedimyrnmom/us-counties-covid-19-dataset
 
+Where I got my geojson: https://eric.clst.org/tech/usgeojson/
+
 ## Heat Maps
 
 
