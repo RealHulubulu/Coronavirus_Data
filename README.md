@@ -11,7 +11,7 @@ Where I got my geojson: https://eric.clst.org/tech/usgeojson/
 Where I got my 2019 census data. It's the United States one: https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html
 
 ## Heat Maps
-Link to a time lapse of county total cases per 100k population from 1/21/2020 to 6/29/2020
+Link to a time lapse of county total cases per 100k population from 1/21/2020 to 6/29/2020. There are some gaps in the map because the census data doesn't work well with the covid data. I am working to fix this.
 
 https://imgur.com/gallery/NfTeIyF
 
