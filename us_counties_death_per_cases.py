@@ -4,6 +4,9 @@ Created on Mon Jun 29 15:54:28 2020
 
 https://plotly.com/python/county-choropleth/?fbclid=IwAR1xOTSniBA_d1okZ-xEOa8eEeapK8AFTgWILshAnEvfLgJQPAhHgsVCIBE
 https://www.kaggle.com/fireballbyedimyrnmom/us-counties-covid-19-dataset
+
+better census data
+https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/
 """
 from urllib.request import urlopen
 import json
@@ -14,8 +17,8 @@ from plotly.offline import plot
 import os
 import math
 
-if not os.path.exists("images"):
-    os.mkdir("images")
+if not os.path.exists("images_counties"):
+    os.mkdir("images_counties")
     
 with urlopen('https://gist.githubusercontent.com/wavded/1250983/raw/bf7c1c08f7b1596ca10822baeb8049d7350b0a4b/stateToFips.json') as response:
     fips_states = json.load(response)       
@@ -190,111 +193,70 @@ def states_heat_map(specific_date_df):
 def counties_heat_map(specific_date_df, date):
     "for showing data per county"
     
-    my_file = os.path.join(THIS_FOLDER, 'population_counties_2019.xlsx')
-    pop_counties = pd.read_excel(open(my_file, 'rb'), index_col=None, sep='\t')
-    
-    # print(pop_counties)
-    # print(pop_counties["Geographic Area"])
-    # pop_counties["Geographic Area"] = pop_counties["Geographic Area"].map(lambda x: x.lstrip('. ,').rstrip('aAbBcC'))
-    pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace('.', '')
-    pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace(',', '')
-    # pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace('District of Columbia District of Columbia', 'District of Columbia')
-    pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace(' County', '')
-    # pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace(' ', '')
+    my_file = os.path.join(THIS_FOLDER, 'all_census_data.csv')
+    pop_counties = pd.read_csv(open(my_file))
     
     # print(pop_counties)
     
-    # for value in pop_counties["Geographic Area"]:
-    #     if "District " in value:
-    #         print(value)
-    # for item in pop_counties["Geographic Area"]:
-    #     if "Virginia" in item:
-    #         print(item)
+    county_id = list(pop_counties["COUNTY"])
+    state_id = list(pop_counties["STATE"])
+    population_per_county = list(pop_counties["POPESTIMATE2019"])
+    fips_county_ids = []
     
-    # print(pop_counties.shape)
-    states_col_for_county_pop = []
-    for index, row in pop_counties.iterrows():
-        one_state = ''
-        for state in fips_states_keys:
-            if state in row["Geographic Area"]:
-                if row["Geographic Area"].find(state) > 1:
-                    one_state = state
-                    # if one_state == "Distric of Columbia":
-                    #     print("huzzah")
-                if state == "District of Columbia":
-                    # print("aye")
-                    # print(one_state)
-                    one_state = "District of Columbia"
-        if one_state in row["Geographic Area"]:
-            states_col_for_county_pop.append(one_state)
-    # print(len(states_col_for_county_pop))
+    for n, c_id in enumerate(county_id):
+        if c_id < 10:
+            county_id[n] = "00"+str(c_id)
+        elif c_id < 100:
+            county_id[n] = "0"+str(c_id)
+        else:
+            county_id[n] = str(c_id)
+            
+    for n, s_id in enumerate(state_id):
+        if s_id < 10:
+            state_id[n] = "0"+str(s_id)
+        else:
+            state_id[n] = str(s_id)
+            
+    # print(county_id[57])
+    # print(state_id[600])
     
-    # print(states_col_for_county_pop)
-    pop_counties["state"] = states_col_for_county_pop
-    # print(pop_counties)
+    for c,s in zip(county_id, state_id):
+        fips_county_ids.append(s + c)
+        
+    # print(fips_county_ids[1])
     
+    # print(len(county_id))
+    # print(len(state_id))
+    # print(len(fips_county_ids))
     
-    
-    counties_list = []
-    for index, row in pop_counties.iterrows():
-        for state in fips_states_keys:
-            if state in row["Geographic Area"]:
-                if row["Geographic Area"].find(state) > 1:
-                        counties = row["Geographic Area"].replace(state, '')
-                if state == "District of Columbia":
-                    # print("trouble maker")
-                    # print(counties)
-                    counties = "District of Columbia"
-        counties_list.append(counties)
-    # for index, row in pop_counties.iterrows():
-    #     if row["state"] in row["Geographic Area"]:
-    #         # print("oh yeah")
-    #         row["Geographic Area"].replace(row["state"], '')
-    #     break
-    
-    # print(len(counties_list))
-    
-    
-    # print((counties_list))
-    pop_counties["Geographic Area"] = counties_list
-    # print(pop_counties)
-    
-    
-    # for index, row in pop_counties.iterrows():
-    #     if row["Geographic Area"] == "District of Columbia":
-    #         # print("sure") #yes
-    
-    # print(specific_date_df)
-    
-    for state, state_id in zip(fips_states_keys, fips_states_values):
-        pop_counties["state"] = pop_counties["state"].replace(state, state_id)
-     
     
     specific_date_df["county"] = specific_date_df["county"].str.replace('.', '') # DistrictOfColumbia 
-    pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace('Parish', '') # DistrictOfColumbia
-    pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace(' ', '') # DistrictOfColumbia
     
-    spec_county = list(specific_date_df["county"])
-    spec_state = list(specific_date_df["state"])
-    pop_county = list(pop_counties["Geographic Area"])
-    pop_state = list(pop_counties["state"])
-    population_per_county = list(pop_counties[2019])
     
+    spec_fips = list(specific_date_df["fips"])
+    
+    
+    odd_balls = [] # unknown county cases
     population_counties_list = []
     # counter = 0
-    for s_county, s_state in zip(spec_county, spec_state): 
+    for spec_fips in spec_fips: 
         boo = True
-        for p_county, p_state in zip(pop_county, pop_state):
-            if s_county == p_county and s_state == p_state:
-                population_counties_list.append(population_per_county[pop_county.index(p_county)]) 
+        for fips_census in fips_county_ids:
+            if spec_fips == fips_census:
+                population_counties_list.append(population_per_county[fips_county_ids.index(fips_census)]) 
                 boo = False
         # counter += 1
         if boo == True:
             population_counties_list.append(1) 
+            odd_balls.append(spec_fips) # unknown county cases
+            # print(spec_fips)
+            
     # print(len(population_counties_list)) # 3065
     # print(population_counties_list)
+
+    
+    
     specific_date_df["county_population"] = population_counties_list
-    # print(specific_date_df)
     
     
     per100k = []
@@ -349,16 +311,19 @@ def counties_heat_map(specific_date_df, date):
     fig = px.choropleth(copy_df, geojson=counties,
                                locations='fips', 
                                color='log10_per100k',
-                               # color_continuous_scale="Reds",
-                                color_continuous_scale="Viridis",
-                               range_color=(0, 5),
+                                color_continuous_scale="icefire", # winner
+                                # color_continuous_scale="Viridis",
+                               # color_continuous_scale="portland",
+                                # color_continuous_scale="phase",
+                                range_color=(0, 5),
                                # locationmode = 'USA-states',
                                featureidkey = "id",
                                hover_name = "county",
                                scope="usa",
+                               labels = {'log10_per100k': 'log10 per 100k pop'}
                               )
     fig.update_layout(margin={"r":5,"t":5,"l":5,"b":5},
-                      title_text = '<br><br>Covid-19 Spread Per 100k Population Per County<br>Using 2019 Census Estimations<br>'+date
+                      title_text = '<br><br>Covid-19 Total Cases Per 100k Population Per County<br>Using 2019 Census Estimations<br>'+date
                       )
     # fig.show()
     # plot(fig)
@@ -372,13 +337,15 @@ def main():
         if i%50 == 0 and new_date != old_date:
             old_date = new_date
             print("Date: ", new_date)
+            # df, current_date = load_data(when = i, yesterday=False)
             df, current_date = load_data(when = i, yesterday=False)
+
             specific_date_df = make_df_for_date(input_date = current_date, df = df)
             fig = counties_heat_map(specific_date_df, new_date)
             # states_heat_map(specific_date_df):
     
-            fig.write_image("images/"+new_date+"_county_per100k.png")
-        # break
+            fig.write_image("images_counties/"+new_date+"_county_per100k.png")
+        break
 #%%
 if __name__ == "__main__":
     main()
@@ -388,15 +355,194 @@ from PIL import Image, ImageDraw
 import PIL
 import os
 images = []
-directory = 'C:/Users/karas/.spyder-py3/coronavirus/images'
+directory = 'C:/Users/karas/.spyder-py3/coronavirus/images_counties'
 for filename in os.listdir(directory):
     # print("hi")
-    f = Image.open('C:/Users/karas/.spyder-py3/coronavirus/images/'+filename)
+    f = Image.open('C:/Users/karas/.spyder-py3/coronavirus/images_counties/'+filename)
     # f = f.save(filename)
     images.append(f)
 
 print(len(images))   
 #%%
-images[0].save('covid_timeline.gif',
-                save_all=True, append_images=images[1:], optimize=False, duration=400, loop=1)
+images[0].save('covid_timeline_county_cases.gif',
+                save_all=True, append_images=images[1:], optimize=False, duration=400, loop=0)
 
+#%%
+#Graveyard
+
+# def counties_heat_map(specific_date_df, date):
+#     "for showing data per county"
+    
+#     my_file = os.path.join(THIS_FOLDER, 'population_counties_2019.xlsx')
+#     pop_counties = pd.read_excel(open(my_file, 'rb'), index_col=None, sep='\t')
+    
+#     # print(pop_counties)
+#     # print(pop_counties["Geographic Area"])
+#     # pop_counties["Geographic Area"] = pop_counties["Geographic Area"].map(lambda x: x.lstrip('. ,').rstrip('aAbBcC'))
+#     pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace('.', '')
+#     pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace(',', '')
+#     # pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace('District of Columbia District of Columbia', 'District of Columbia')
+#     pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace(' County', '')
+#     # pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace(' ', '')
+    
+#     # print(pop_counties)
+    
+#     # for value in pop_counties["Geographic Area"]:
+#     #     if "District " in value:
+#     #         print(value)
+#     # for item in pop_counties["Geographic Area"]:
+#     #     if "Virginia" in item:
+#     #         print(item)
+    
+#     # print(pop_counties.shape)
+#     states_col_for_county_pop = []
+#     for index, row in pop_counties.iterrows():
+#         one_state = ''
+#         for state in fips_states_keys:
+#             if state in row["Geographic Area"]:
+#                 if row["Geographic Area"].find(state) > 1:
+#                     one_state = state
+#                     # if one_state == "Distric of Columbia":
+#                     #     print("huzzah")
+#                 if state == "District of Columbia":
+#                     # print("aye")
+#                     # print(one_state)
+#                     one_state = "District of Columbia"
+#         if one_state in row["Geographic Area"]:
+#             states_col_for_county_pop.append(one_state)
+#     # print(len(states_col_for_county_pop))
+    
+#     # print(states_col_for_county_pop)
+#     pop_counties["state"] = states_col_for_county_pop
+#     # print(pop_counties)
+    
+    
+    
+#     counties_list = []
+#     for index, row in pop_counties.iterrows():
+#         for state in fips_states_keys:
+#             if state in row["Geographic Area"]:
+#                 if row["Geographic Area"].find(state) > 1:
+#                         counties = row["Geographic Area"].replace(state, '')
+#                 if state == "District of Columbia":
+#                     # print("trouble maker")
+#                     # print(counties)
+#                     counties = "District of Columbia"
+#         counties_list.append(counties)
+#     # for index, row in pop_counties.iterrows():
+#     #     if row["state"] in row["Geographic Area"]:
+#     #         # print("oh yeah")
+#     #         row["Geographic Area"].replace(row["state"], '')
+#     #     break
+    
+#     # print(len(counties_list))
+    
+    
+#     # print((counties_list))
+#     pop_counties["Geographic Area"] = counties_list
+#     # print(pop_counties)
+    
+    
+#     # for index, row in pop_counties.iterrows():
+#     #     if row["Geographic Area"] == "District of Columbia":
+#     #         # print("sure") #yes
+    
+#     # print(specific_date_df)
+    
+#     for state, state_id in zip(fips_states_keys, fips_states_values):
+#         pop_counties["state"] = pop_counties["state"].replace(state, state_id)
+     
+    
+#     specific_date_df["county"] = specific_date_df["county"].str.replace('.', '') # DistrictOfColumbia 
+#     pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace('Parish', '') # DistrictOfColumbia
+#     pop_counties["Geographic Area"] = pop_counties["Geographic Area"].str.replace(' ', '') # DistrictOfColumbia
+    
+#     spec_county = list(specific_date_df["county"])
+#     spec_state = list(specific_date_df["state"])
+#     pop_county = list(pop_counties["Geographic Area"])
+#     pop_state = list(pop_counties["state"])
+#     population_per_county = list(pop_counties[2019])
+    
+#     population_counties_list = []
+#     # counter = 0
+#     for s_county, s_state in zip(spec_county, spec_state): 
+#         boo = True
+#         for p_county, p_state in zip(pop_county, pop_state):
+#             if s_county == p_county and s_state == p_state:
+#                 population_counties_list.append(population_per_county[pop_county.index(p_county)]) 
+#                 boo = False
+#         # counter += 1
+#         if boo == True:
+#             population_counties_list.append(1) 
+#     # print(len(population_counties_list)) # 3065
+#     # print(population_counties_list)
+#     specific_date_df["county_population"] = population_counties_list
+#     # print(specific_date_df)
+    
+    
+#     per100k = []
+#     for pop, count in zip(specific_date_df["county_population"], specific_date_df["cases"]):
+#         if pop == 1:
+#             per100k.append(1)
+#         else:
+#             per100k.append(100000 * (count/pop))
+        
+#     specific_date_df["per100k"] = per100k
+#     # print(specific_date_df)
+#     # print(per100k)
+    
+#     per10k = []
+#     for pop, count in zip(specific_date_df["county_population"], specific_date_df["cases"]):
+#         if pop == 1:
+#             per10k.append(1)
+#         else:
+#             per10k.append(10000 * (count/pop))
+
+
+#     specific_date_df["per10k"] = per10k
+#     # print(specific_date_df)
+#     # print(per10k)
+    
+#     # import math
+#     log10_per10k = []
+#     for item in per10k:
+#         # print(item)
+#         log10_per10k.append(math.log10(item))
+#     specific_date_df["log10_per10k"] = log10_per10k
+    
+#     # import math
+#     log10_per100k = []
+#     for item in per100k:
+#         # print(item)
+#         log10_per100k.append(math.log10(item))
+#     specific_date_df["log10_per100k"] = log10_per100k
+    
+    
+#     copy_df = specific_date_df.copy() # this is to remove data from census that is missing from covid
+#     copy_df = copy_df[copy_df['log10_per100k'] != 0]
+    
+#     # Per county geojson
+#     with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+#         counties = json.load(response)
+    
+#     # print(counties["features"][0]["properties"]["STATE"])
+#     # print((counties["features"][0])) #3221
+    
+#     # per county
+#     fig = px.choropleth(copy_df, geojson=counties,
+#                                locations='fips', 
+#                                color='log10_per100k',
+#                                # color_continuous_scale="Reds",
+#                                 color_continuous_scale="Viridis",
+#                                range_color=(0, 5),
+#                                # locationmode = 'USA-states',
+#                                featureidkey = "id",
+#                                hover_name = "county",
+#                                scope="usa",
+#                               )
+#     fig.update_layout(margin={"r":5,"t":5,"l":5,"b":5},
+#                       title_text = '<br><br>Covid-19 Spread Per 100k Population Per County<br>Using 2019 Census Estimations<br>'+date
+#                       )
+#     # fig.show()
+#     # plot(fig)
+#     return fig
