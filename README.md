@@ -10,7 +10,7 @@ Where I got my state geojson: https://eric.clst.org/tech/usgeojson/
 
 Where I got my county geojson (and also a nifty tutorial on making this graphs): https://plotly.com/python/choropleth-maps/
 
-Where I got my 2019 census data. It's the United States one: https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html
+Where I got my 2019 census data. It's the United States one: https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/
 
 ## Heat Maps
 Link to a time lapse of county total cases per 100k population from 1/21/2020 to 6/29/2020. There are some gaps in the map because the census data doesn't work well with the covid data. I am working to fix this.
