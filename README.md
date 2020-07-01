@@ -6,7 +6,9 @@ creates a heat map per 100k population. It is easy to see how to adjust the inpu
 
 Covid dataset on kaggle: https://www.kaggle.com/fireballbyedimyrnmom/us-counties-covid-19-dataset
 
-Where I got my geojson: https://eric.clst.org/tech/usgeojson/
+Where I got my state geojson: https://eric.clst.org/tech/usgeojson/
+
+Where I got my county geojson (and also a nifty tutorial on making this graphs): https://plotly.com/python/choropleth-maps/
 
 Where I got my 2019 census data. It's the United States one: https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html
 
