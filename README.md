@@ -15,9 +15,9 @@ Where I got my 2019 census data. It's the United States one: https://www2.census
 Link to the Rt data and live dashboards: https://rt.live/
 
 ## Heat Maps
-Link to a time lapse of county total cases per 100k population from 1/21/2020 to 6/29/2020. There are some gaps in the map because the census data doesn't work well with the covid data. I am working to fix this.
+Link to a time lapse of county total cases per 100k population from 1/21/2020 to 6/29/2020. The gaps towards the end are counties not reporting yet.
 
-https://imgur.com/gallery/NfTeIyF
+https://imgur.com/gallery/tGjnzOm
 
 Link to a time lapse of state Rt data from 3/8/2020 to 6/29/2020.
 
