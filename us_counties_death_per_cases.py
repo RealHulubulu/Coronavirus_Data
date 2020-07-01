@@ -187,7 +187,7 @@ def states_heat_map(specific_date_df):
 
 
 #%%
-def counties_heat_map(specific_date_df):
+def counties_heat_map(specific_date_df, date):
     "for showing data per county"
     
     my_file = os.path.join(THIS_FOLDER, 'population_counties_2019.xlsx')
@@ -260,9 +260,9 @@ def counties_heat_map(specific_date_df):
     # print(pop_counties)
     
     
-    for index, row in pop_counties.iterrows():
-        if row["Geographic Area"] == "District of Columbia":
-            # print("sure") #yes
+    # for index, row in pop_counties.iterrows():
+    #     if row["Geographic Area"] == "District of Columbia":
+    #         # print("sure") #yes
     
     # print(specific_date_df)
     
@@ -349,16 +349,18 @@ def counties_heat_map(specific_date_df):
     fig = px.choropleth(copy_df, geojson=counties,
                                locations='fips', 
                                color='log10_per100k',
-                               color_continuous_scale="Viridis",
-                               # range_color=(0, 10),
+                               # color_continuous_scale="Reds",
+                                color_continuous_scale="Viridis",
+                               range_color=(0, 5),
                                # locationmode = 'USA-states',
                                featureidkey = "id",
                                hover_name = "county",
                                scope="usa",
-                               labels={'log10_per100k':'log10 cases per 100k'}
                               )
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-    fig.show()
+    fig.update_layout(margin={"r":5,"t":5,"l":5,"b":5},
+                      title_text = '<br><br>Covid-19 Spread Per 100k Population Per County<br>Using 2019 Census Estimations<br>'+date
+                      )
+    # fig.show()
     # plot(fig)
     return fig
 #%%
@@ -372,12 +374,29 @@ def main():
             print("Date: ", new_date)
             df, current_date = load_data(when = i, yesterday=False)
             specific_date_df = make_df_for_date(input_date = current_date, df = df)
-            fig = counties_heat_map(specific_date_df)
+            fig = counties_heat_map(specific_date_df, new_date)
             # states_heat_map(specific_date_df):
     
             fig.write_image("images/"+new_date+"_county_per100k.png")
-    
+        # break
 #%%
 if __name__ == "__main__":
     main()
+
 #%%
+from PIL import Image, ImageDraw
+import PIL
+import os
+images = []
+directory = 'C:/Users/karas/.spyder-py3/coronavirus/images'
+for filename in os.listdir(directory):
+    # print("hi")
+    f = Image.open('C:/Users/karas/.spyder-py3/coronavirus/images/'+filename)
+    # f = f.save(filename)
+    images.append(f)
+
+print(len(images))   
+#%%
+images[0].save('covid_timeline.gif',
+                save_all=True, append_images=images[1:], optimize=False, duration=400, loop=1)
+
