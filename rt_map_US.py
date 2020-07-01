@@ -77,7 +77,9 @@ for new_date in dates_list:
                                 locations='state', 
                                 color='rt_mean',
                                 color_continuous_scale="icefire",
-                                range_color=(0, 4),
+                                # range_color=(0, 4),
+                                range_color=(0, 2),
+
                                 # locationmode = 'USA-states',
                                 featureidkey = "properties.STATE",
                                 hover_name = "state",
@@ -97,19 +99,19 @@ for new_date in dates_list:
 
 
 #%%
-# from PIL import Image, ImageDraw
-# import PIL
-# import os
-# images = []
-# directory = 'C:/Users/karas/.spyder-py3/coronavirus/images_rt'
-# for filename in os.listdir(directory):
-#     # print("hi")
-#     f = Image.open('C:/Users/karas/.spyder-py3/coronavirus/images_rt/'+filename)
-#     # f = f.save(filename)
-#     images.append(f)
+from PIL import Image, ImageDraw
+import PIL
+import os
+images = []
+directory = 'C:/Users/karas/.spyder-py3/coronavirus/images_rt'
+for filename in os.listdir(directory):
+    # print("hi")
+    f = Image.open('C:/Users/karas/.spyder-py3/coronavirus/images_rt/'+filename)
+    # f = f.save(filename)
+    images.append(f)
 
-# print(len(images))   
-# #%%
-# images[0].save('covid_timeline_rt.gif',
-#                 save_all=True, append_images=images[1:], optimize=False, duration=400, loop=0)
+print(len(images))   
+
+images[0].save('covid_timeline_rt_centered1.gif',
+                save_all=True, append_images=images[1:], optimize=False, duration=500, loop=0)
 

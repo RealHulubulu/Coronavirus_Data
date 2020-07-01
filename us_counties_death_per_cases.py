@@ -345,7 +345,7 @@ def main():
             # states_heat_map(specific_date_df):
     
             fig.write_image("images_counties/"+new_date+"_county_per100k.png")
-        break
+        # break
 #%%
 if __name__ == "__main__":
     main()
@@ -363,9 +363,9 @@ for filename in os.listdir(directory):
     images.append(f)
 
 print(len(images))   
-#%%
+
 images[0].save('covid_timeline_county_cases.gif',
-                save_all=True, append_images=images[1:], optimize=False, duration=400, loop=0)
+                save_all=True, append_images=images[1:], optimize=False, duration=500, loop=0)
 
 #%%
 #Graveyard
