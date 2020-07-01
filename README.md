@@ -14,7 +14,7 @@ Where I got my 2019 census data. It's the United States one: https://www2.census
 
 Link to the Rt data and live dashboards: https://rt.live/
 
-## Heat Maps
+## Covid Cases Heat Maps
 Link to a time lapse of county total cases per 100k population from 1/21/2020 to 6/29/2020. The gaps towards the end are counties not reporting yet.
 
 https://imgur.com/gallery/tGjnzOm
@@ -34,6 +34,20 @@ This is the data per 100k population per state on 6/28/2020
 This is the data per 100k population per county on 6/29/2020
 
 ![Per County Total Count per 100k](/covid_per100k_counties_06292020.png)
+
+### Rt Heat Maps
+
+This is the Rt data per state for 3/08/2020.
+
+![Per State rt](/2020-03-08_rt_per_state.png)
+
+This is the Rt data per state for 3/28/2020.
+
+![Per State rt](/2020-03-28_rt_per_state.png)
+
+This is the Rt data per state for 5/14/2020.
+
+![Per State rt](/2020-05-14_rt_per_state.png)
 
 This is the Rt data per state for 6/29/2020.
 
