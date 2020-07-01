@@ -12,10 +12,16 @@ Where I got my county geojson (and also a nifty tutorial on making this graphs):
 
 Where I got my 2019 census data. It's the United States one: https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/
 
+Link to the Rt data and live dashboards: https://rt.live/
+
 ## Heat Maps
 Link to a time lapse of county total cases per 100k population from 1/21/2020 to 6/29/2020. There are some gaps in the map because the census data doesn't work well with the covid data. I am working to fix this.
 
 https://imgur.com/gallery/NfTeIyF
+
+Link to a time lapse of state Rt data from 3/8/2020 to 6/29/2020.
+
+https://imgur.com/gallery/dIDRuVW
 
 This is the data per state total count on 6/28/2020
 
