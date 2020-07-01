@@ -17,16 +17,21 @@ Link to a time lapse of county total cases per 100k population from 1/21/2020 to
 
 https://imgur.com/gallery/NfTeIyF
 
-This is the data per state total count.
+This is the data per state total count on 6/28/2020
 
 ![Per State Total Count](/covid_total_states_06282020.png)
 
-This is the data per 100k population per state.
+This is the data per 100k population per state on 6/28/2020
 
-![Per State Total Count](/covid_per100k_states_06282020.png)
+![Per State Total Count per 100k](/covid_per100k_states_06282020.png)
 
-This is the data per 100k population per county. There are gaps where the census data isn't matching up well. I am working to fix it.
+This is the data per 100k population per county on 6/29/2020
 
-![Per State Total Count](/covid_per100k_counties_06292020.png)
+![Per County Total Count per 100k](/covid_per100k_counties_06292020.png)
+
+This is the Rt data per state for 6/29/2020.
+
+![Per State rt](/2020-06-29_rt_per_state.png)
+
 
 
