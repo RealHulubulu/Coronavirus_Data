@@ -8,6 +8,8 @@ Covid dataset on kaggle: https://www.kaggle.com/fireballbyedimyrnmom/us-counties
 
 Where I got my geojson: https://eric.clst.org/tech/usgeojson/
 
+Where I got my 2019 census data. It's the United States one: https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html
+
 ## Heat Maps
 Link to a time lapse of county total cases per 100k population from 1/21/2020 to 6/29/2020
 
