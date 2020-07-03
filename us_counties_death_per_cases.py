@@ -59,7 +59,7 @@ def make_df_for_date(input_date, df):
     # 3067 x 6
     
     
-    specific_date_df = specific_date_df.copy()
+    # specific_date_df = specific_date_df.copy()
     
     IFR_list = []
     for index, row in specific_date_df.iterrows():
@@ -113,6 +113,17 @@ def make_df_for_date(input_date, df):
     for state, state_id in zip(fips_states_keys, fips_states_values):
         specific_date_df['state'] = specific_date_df['state'].replace(state, state_id)
     # print(specific_date_df)
+        
+    specific_date_df["state_name"] = specific_date_df["state"]
+    for state, state_id in zip(fips_states_keys, fips_states_values):
+        specific_date_df['state_name'] = specific_date_df['state_name'].replace(state_id, state)
+        
+    county_and_state = []
+    for index, row in specific_date_df.iterrows():
+        c_and_s = row["county"] +", "+ row["state_name"]
+        county_and_state.append(c_and_s)
+    specific_date_df["county_and_state"] = county_and_state
+        
     return specific_date_df
 
 #%%
@@ -266,7 +277,7 @@ def counties_heat_map(specific_date_df, date):
         else:
             per100k.append(100000 * (count/pop))
         
-    specific_date_df["per100k"] = per100k
+    specific_date_df["cases_per100k"] = per100k
     # print(specific_date_df)
     # print(per100k)
     
@@ -294,11 +305,12 @@ def counties_heat_map(specific_date_df, date):
     for item in per100k:
         # print(item)
         log10_per100k.append(math.log10(item))
-    specific_date_df["log10_per100k"] = log10_per100k
+    specific_date_df["cases_per_log10_per100k"] = log10_per100k
+    
     
     
     copy_df = specific_date_df.copy() # this is to remove data from census that is missing from covid
-    copy_df = copy_df[copy_df['log10_per100k'] != 0]
+    copy_df = copy_df[copy_df['cases_per_log10_per100k'] != 0]
     
     # Per county geojson
     with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
@@ -310,22 +322,30 @@ def counties_heat_map(specific_date_df, date):
     # per county
     fig = px.choropleth(copy_df, geojson=counties,
                                locations='fips', 
-                               color='log10_per100k',
-                                color_continuous_scale="icefire", # winner
+                               color='cases_per_log10_per100k',
+                                # color_continuous_scale="icefire", # winner
                                 # color_continuous_scale="Viridis",
-                               # color_continuous_scale="portland",
-                                # color_continuous_scale="phase",
+                                # color_continuous_scale="hot",
+                                # color_continuous_scale="ice",
+                                # color_continuous_scale="thermal",
+                                color_continuous_scale=[[0.0,'rgb(0,0,200)'],
+                                                        [0.3, 'rgb(149,207,216)'],
+                                                        [0.5, 'rgb(234,252,258)'],
+                                                        [0.6, 'rgb(255,210,0)'],
+                                                        [1.0, 'rgb(200,0,0)']],
                                 range_color=(0, 5),
                                # locationmode = 'USA-states',
                                featureidkey = "id",
-                               hover_name = "county",
+                               hover_name = "county_and_state",
+                               hover_data = ["county_population", "cases", "cases_per100k", "cases_per_log10_per100k", "deaths", "IFR"],
                                scope="usa",
-                               labels = {'log10_per100k': 'log10 per 100k pop'}
+                               labels = {'cases_per_log10_per100k': 'cases per log10 per 100k pop'}
                               )
     fig.update_layout(margin={"r":5,"t":5,"l":5,"b":5},
                       title_text = '<br><br>Covid-19 Total Cases Per 100k Population Per County<br>Using 2019 Census Estimations<br>'+date
                       )
     # fig.show()
+    # plot(fig,filename='covid_counties_'+date+'.html')
     # plot(fig)
     return fig
 #%%
@@ -336,9 +356,17 @@ def main():
         new_date = dfmain["date"][i]
         if i%50 == 0 and new_date != old_date:
             old_date = new_date
+            
+            # new_date = dfmain["date"][dfmain.shape[0] - 1] # if yesterday = True
+            # new_date = '2020-06-30'
+            
             print("Date: ", new_date)
             # df, current_date = load_data(when = i, yesterday=False)
             df, current_date = load_data(when = i, yesterday=False)
+
+
+            # current_date = '2020-06-30'
+
 
             specific_date_df = make_df_for_date(input_date = current_date, df = df)
             fig = counties_heat_map(specific_date_df, new_date)
@@ -350,22 +378,22 @@ def main():
 if __name__ == "__main__":
     main()
 
-#%%
-from PIL import Image, ImageDraw
-import PIL
-import os
-images = []
-directory = 'C:/Users/karas/.spyder-py3/coronavirus/images_counties'
-for filename in os.listdir(directory):
-    # print("hi")
-    f = Image.open('C:/Users/karas/.spyder-py3/coronavirus/images_counties/'+filename)
-    # f = f.save(filename)
-    images.append(f)
+# #%%
+# from PIL import Image, ImageDraw
+# import PIL
+# import os
+# images = []
+# directory = 'C:/Users/karas/.spyder-py3/coronavirus/images_counties'
+# for filename in os.listdir(directory):
+#     # print("hi")
+#     f = Image.open('C:/Users/karas/.spyder-py3/coronavirus/images_counties/'+filename)
+#     # f = f.save(filename)
+#     images.append(f)
 
-print(len(images))   
+# print(len(images))   
 
-images[0].save('covid_timeline_county_cases.gif',
-                save_all=True, append_images=images[1:], optimize=False, duration=500, loop=0)
+# images[0].save('covid_timeline_county_cases_05to5.gif',
+#                 save_all=True, append_images=images[1:], optimize=False, duration=500, loop=0)
 
 #%%
 #Graveyard
