@@ -35,6 +35,14 @@ dfmain = pd.read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/ma
 # current_date = dfmain["date"][dfmain.shape[0] - 1] # 6/29/2020, or yesterday
 # current_date = df["date"][10] # 6/29/2020
 #%%
+def line_prepender(filename, line):
+    with open(filename, 'r+') as f:
+        content = f.read()
+        f.seek(0, 0)
+        f.write(line.rstrip('\r\n') + '\n' + content)
+        f.write('\n{% endblock %}')
+
+#%%
 def load_data(when = 0, yesterday=True):
     df = pd.read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv',
                  dtype={"fips": str})
@@ -70,6 +78,8 @@ def make_df_for_date(input_date, df):
             IFR_list.append(0)
     
     specific_date_df["IFR"] = IFR_list
+      
+    
     
     # print(specific_date_df)
     
@@ -339,13 +349,26 @@ def counties_heat_map(specific_date_df, date):
                                hover_name = "county_and_state",
                                hover_data = ["county_population", "cases", "cases_per100k", "cases_per_log10_per100k", "deaths", "IFR"],
                                scope="usa",
-                               labels = {'cases_per_log10_per100k': 'cases per log10 per 100k pop'}
+                               labels = {'cases_per_log10_per100k': 'log(cases/100k)'}
                               )
-    fig.update_layout(margin={"r":5,"t":5,"l":5,"b":5},
-                      title_text = '<br><br>Covid-19 Total Cases Per 100k Population Per County<br>Using 2019 Census Estimations<br>'+date
+    fig.update_layout(margin={"r":5,"t":20,"l":5,"b":5},
+                      title_text = '<br><br>Covid-19 Total Cases Per 100k Population Per<br>County Using 2019 Census Estimations<br>'+date,
+                      titlefont = {"size": 15, "color":"White"},
+                       paper_bgcolor='#4E5D6C',
+                       plot_bgcolor='#4E5D6C',
+                        geo=dict(bgcolor= 'rgba(0,0,0,0)', lakecolor='#4E5D6C'),
+                        font = {"size": 14, "color":"White"},
+                        autosize = False,
+                        width = 800,
+                        height = 650
                       )
     # fig.show()
     # plot(fig,filename='covid_counties_'+date+'.html')
+    
+    plot(fig,filename='C:/Users/karas/.spyder-py3/Covid_Maps_Heroku/main_site_covid/templates/Current_counties.html')
+    
+    # plot(fig,filename='C:/Users/karas/.spyder-py3/Covid_Maps_Heroku/main_site_covid/templates/'+date+'_counties.html')
+    
     # plot(fig)
     return fig
 #%%
@@ -357,23 +380,33 @@ def main():
         if i%50 == 0 and new_date != old_date:
             old_date = new_date
             
-            # new_date = dfmain["date"][dfmain.shape[0] - 1] # if yesterday = True
+            new_date = dfmain["date"][dfmain.shape[0] - 1] # if yesterday = True
             # new_date = '2020-06-30'
             
             print("Date: ", new_date)
             # df, current_date = load_data(when = i, yesterday=False)
-            df, current_date = load_data(when = i, yesterday=False)
+            df, current_date = load_data(when = i, yesterday=True)
 
 
-            # current_date = '2020-06-30'
+            # current_date = new_date
 
 
             specific_date_df = make_df_for_date(input_date = current_date, df = df)
             fig = counties_heat_map(specific_date_df, new_date)
             # states_heat_map(specific_date_df):
     
-            fig.write_image("images_counties/"+new_date+"_county_per100k.png")
-        # break
+            # fig.write_image("images_counties/"+new_date+"_county_per100k.png")
+            
+            fig.write_image("C:/Users/karas/.spyder-py3/Covid_Maps_Heroku/main_site_covid/pages/static/current_counties.png")
+            html_header = """
+{% extends 'base.html' %}
+{% block content %}
+<body style="background-color:black;color:white;">
+    """
+            line_prepender('C:/Users/karas/.spyder-py3/Covid_Maps_Heroku/main_site_covid/templates/Current_counties.html', html_header)
+    
+        break
+    
 #%%
 if __name__ == "__main__":
     main()
@@ -392,7 +425,7 @@ if __name__ == "__main__":
 
 # print(len(images))   
 
-# images[0].save('covid_timeline_county_cases_05to5.gif',
+# images[0].save('covid_timeline_county_cases.gif',
 #                 save_all=True, append_images=images[1:], optimize=False, duration=500, loop=0)
 
 #%%
